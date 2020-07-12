@@ -23,14 +23,6 @@ namespace comp6771 {
 
 	class euclidean_vector {
 	public:
-		// some fun little functions to make my life easier
-		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		[[nodiscard]] auto magnitude() const -> std::unique_ptr<double[]>;
-		[[nodiscard]] auto dimension() const -> int;
-		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		auto set_magnitude(std::unique_ptr<double[]> mag, int dim) -> void;
-		auto set_dimension(int dim) -> void;
-
 		// Constructors
 		euclidean_vector();
 		explicit euclidean_vector(int dim);
@@ -45,39 +37,50 @@ namespace comp6771 {
 		~euclidean_vector() = default;
 
 		// Operations
-		auto operator=(euclidean_vector const&) -> euclidean_vector&;
-		auto operator=(euclidean_vector&&) noexcept -> euclidean_vector&;
-		auto operator[](int) -> double;
-		auto operator[](int) const -> double;
+		auto operator=(euclidean_vector const& src) -> euclidean_vector&;
+		auto operator=(euclidean_vector&& src) noexcept -> euclidean_vector&;
+		auto operator[](int i) -> double&;
+		auto operator[](int i) const -> double;
 		auto operator+() -> euclidean_vector;
 		auto operator-() -> euclidean_vector;
-		auto operator+=(euclidean_vector const&) -> euclidean_vector&;
-		auto operator-=(euclidean_vector const&) -> euclidean_vector&;
-		auto operator*=(double) -> euclidean_vector&;
-		auto operator/=(double) -> euclidean_vector&;
+		auto operator+=(euclidean_vector const& src) -> euclidean_vector&;
+		auto operator-=(euclidean_vector const& src) -> euclidean_vector&;
+		auto operator*=(double n) -> euclidean_vector&;
+		auto operator/=(double n) -> euclidean_vector&;
 		explicit operator std::vector<double>();
 		explicit operator std::list<double>();
 
 		// Member Functions
-		[[nodiscard]] auto at(int) const -> double;
-		auto at(int) -> double&;
-		auto dimensions() -> int;
+		[[nodiscard]] auto at(int i) const -> double;
+		auto at(int i) -> double&;
+		[[nodiscard]] auto dimensions() const -> int;
 
 		// Friend Functions
-		friend auto operator==(euclidean_vector const&, euclidean_vector const&) -> bool;
-		friend auto operator!=(euclidean_vector const&, euclidean_vector const&) -> bool;
-		friend auto operator+(euclidean_vector const&, euclidean_vector const&) -> euclidean_vector;
-		friend auto operator-(euclidean_vector const&, euclidean_vector const&) -> euclidean_vector;
-		friend auto operator*(euclidean_vector const&, double) -> euclidean_vector;
-		friend auto operator/(euclidean_vector const&, double) -> euclidean_vector;
-		friend auto operator<<(std::ostream&, euclidean_vector const&) -> std::ostream&;
+		friend auto operator==(euclidean_vector const& vec1, euclidean_vector const& vec2) -> bool;
+		friend auto operator!=(euclidean_vector const& vec1, euclidean_vector const& vec2) -> bool;
+		friend auto operator+(euclidean_vector const& vec1, euclidean_vector const& vec2)
+		   -> euclidean_vector;
+		friend auto operator-(euclidean_vector const& vec1, euclidean_vector const& vec2)
+		   -> euclidean_vector;
+		friend auto operator*(euclidean_vector const& vec, double n) -> euclidean_vector;
+		friend auto operator/(euclidean_vector const& vec, double n) -> euclidean_vector;
+		friend auto operator<<(std::ostream& strm, euclidean_vector const& vec) -> std::ostream&;
 
 		// Utility Functions
 
 	private:
+		// Attributes
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 		std::unique_ptr<double[]> magnitude_;
 		int dimension_;
+
+		// some fun little functions to make my life easier
+		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+		[[nodiscard]] auto magnitude() const -> std::unique_ptr<double[]>;
+
+		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+		auto set_magnitude(std::unique_ptr<double[]> mag, int dim) -> void;
+		auto set_dimension(int dim) -> void;
 	};
 } // namespace comp6771
 #endif // COMP6771_EUCLIDEAN_VECTOR_HPP
