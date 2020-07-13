@@ -3,47 +3,22 @@
 //
 #include "comp6771/euclidean_vector.hpp"
 #include <cstddef>
-#include <gsl-lite/gsl-lite.hpp>
+#include <fmt/format.h>
 #include <gsl/gsl-lite.hpp>
+#include <iostream>
 
 namespace comp6771 {
-
-	// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-	auto euclidean_vector::magnitude() const -> std::unique_ptr<double[]> {
-		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		auto mag = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dimensions()));
-		for (auto i = 0; i < dimensions(); i++) {
-			mag[gsl_lite::narrow_cast<size_t>(i)] = magnitude_[gsl_lite::narrow_cast<size_t>(i)];
-		}
-
-		return mag;
-	}
-
-	// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-	auto euclidean_vector::set_magnitude(std::unique_ptr<double[]> mag, int dim) -> void {
-		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
-
-		for (auto i = 0; i < dimensions(); i++) {
-			magnitude_[gsl_lite::narrow_cast<size_t>(i)] = mag[gsl_lite::narrow_cast<size_t>(i)];
-		}
-	}
-
-	auto euclidean_vector::set_dimension(int dim) -> void {
-		dimension_ = dim;
-	}
-
 	// Implement solution here
 	euclidean_vector::euclidean_vector() { // default constructor
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = std::make_unique<double[]>(1);
+		magnitude_ = std::make_unique<double[]>(1);
 		dimension_ = 1;
-		magnitude()[0] = 0.0;
+		magnitude_[0] = 0.0;
 	}
 
 	euclidean_vector::euclidean_vector(int dim) { // dimension specified
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
+		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
 		dimension_ = dim;
 		for (auto i = size_t(0); i < gsl_lite::narrow_cast<size_t>(dim); i++) {
 			magnitude()[i] = 0.0;
@@ -53,10 +28,10 @@ namespace comp6771 {
 	euclidean_vector::euclidean_vector(int dim, double val) { // default value and dimension
 		                                                       // specified
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
+		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
 		dimension_ = dim;
 		for (auto i = size_t(0); i < gsl_lite::narrow_cast<size_t>(dim); i++) {
-			magnitude()[i] = val;
+			magnitude_[i] = val;
 		}
 	}
 
@@ -69,11 +44,11 @@ namespace comp6771 {
 		}
 
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(c));
+		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(c));
 		dimension_ = c;
 		auto x = size_t(0);
 		for (auto i = start; i < end; i++) {
-			magnitude()[x] = *i;
+			magnitude_[x] = *i;
 			x++;
 		}
 	}
@@ -81,27 +56,27 @@ namespace comp6771 {
 	euclidean_vector::euclidean_vector(std::initializer_list<double> vals) { // Given initializer
 		                                                                      // list only
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(vals.size()));
+		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(vals.size()));
 		dimension_ = gsl_lite::narrow_cast<int>(vals.size());
 		auto i = size_t(0);
 		for (double x : vals) {
-			magnitude()[i] = x;
+			magnitude_[i] = x;
 			i++;
 		}
 	}
 
-	euclidean_vector::euclidean_vector(euclidean_vector const& old) { // Copy constructor
+	euclidean_vector::euclidean_vector(euclidean_vector const& src) { // Copy constructor
 		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-		magnitude() = old.magnitude();
-		dimension_ = old.dimensions();
+		magnitude_ = src.magnitude();
+		dimension_ = src.dimensions();
 	}
 
-	euclidean_vector::euclidean_vector(euclidean_vector&& old) noexcept { // Move constructor
-		magnitude() = old.magnitude();
-		dimension_ = old.dimensions();
+	euclidean_vector::euclidean_vector(euclidean_vector&& src) noexcept { // Move constructor
+		magnitude_ = src.magnitude();
+		dimension_ = src.dimensions();
 
-		old.set_dimension(0);
-		old.set_magnitude(nullptr, 0);
+		src.set_dimension(0);
+		src.set_magnitude(nullptr, 0);
 	}
 
 	// copy assignment
@@ -110,7 +85,7 @@ namespace comp6771 {
 			return *this;
 		}
 
-		magnitude() = src.magnitude();
+		magnitude_ = src.magnitude();
 		dimension_ = src.dimensions();
 
 		return *this;
@@ -122,7 +97,7 @@ namespace comp6771 {
 			return *this;
 		}
 
-		magnitude() = src.magnitude();
+		magnitude_ = src.magnitude();
 		dimension_ = src.dimensions();
 
 		src.set_dimension(0);
@@ -133,13 +108,13 @@ namespace comp6771 {
 
 	// subscript
 	auto euclidean_vector::operator[](int i) -> double& {
-		assert(i >= 0 and index < dimensions()); // Ensure the index is within bounds
-		return magnitude()[gsl_lite::narrow_cast<size_t>(i)];
+		assert(i >= 0 and i < dimensions()); // Ensure the index is within bounds
+		return magnitude_[gsl_lite::narrow_cast<size_t>(i)];
 	}
 
 	// const subscript
 	auto euclidean_vector::operator[](int i) const -> double {
-		assert(i >= 0 and index < dimensions()); // Ensure the index is within bounds
+		assert(i >= 0 and i < dimensions()); // Ensure the index is within bounds
 		return magnitude()[gsl_lite::narrow_cast<size_t>(i)];
 	}
 
@@ -154,26 +129,39 @@ namespace comp6771 {
 
 	// negation
 	auto euclidean_vector::operator-() -> euclidean_vector {
+		auto new_ev = euclidean_vector(this->dimensions());
 		for (auto i = 0; i < this->dimensions(); i++) {
-			this[i] = -this[i];
+			new_ev[i] = -this->magnitude()[gsl_lite::narrow_cast<size_t>(i)];
 		}
-		return *this;
+		return new_ev;
 	}
 
 	// compound addition
 	auto euclidean_vector::operator+=(euclidean_vector const& src) -> euclidean_vector& {
+		if (this->dimension_ != src.dimensions()) {
+			throw euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+			                                         "match",
+			                                         this->dimensions(),
+			                                         src.dimensions()));
+		}
 		for (auto i = 0; i < this->dimensions(); i++) {
-			this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] =
-			   this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] + src[i];
+			this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] =
+			   this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] + src[i];
 		}
 		return *this;
 	}
 
 	// compound subtraction
 	auto euclidean_vector::operator-=(euclidean_vector const& src) -> euclidean_vector& {
+		if (this->dimension_ != src.dimensions()) {
+			throw euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+			                                         "match",
+			                                         this->dimensions(),
+			                                         src.dimensions()));
+		}
 		for (auto i = 0; i < this->dimensions(); i++) {
-			this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] =
-			   this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] - src[i];
+			this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] =
+			   this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] - src[i];
 		}
 		return *this;
 	}
@@ -181,17 +169,21 @@ namespace comp6771 {
 	// compound multiplication
 	auto euclidean_vector::operator*=(double n) -> euclidean_vector& {
 		for (auto i = 0; i < this->dimensions(); i++) {
-			this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] =
-			   this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] * n;
+			this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] =
+			   this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] * n;
 		}
 		return *this;
 	}
 
 	// compound division
 	auto euclidean_vector::operator/=(double n) -> euclidean_vector& {
+		if (n == 0) {
+			throw euclidean_vector_error("Invalid vector division by 0");
+		}
+
 		for (auto i = 0; i < this->dimensions(); i++) {
-			this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] =
-			   this->magnitude()[gsl_lite::narrow_cast<size_t>(i)] / n;
+			this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] =
+			   this->magnitude_[gsl_lite::narrow_cast<size_t>(i)] / n;
 		}
 		return *this;
 	}
@@ -216,12 +208,22 @@ namespace comp6771 {
 
 	// const at function
 	auto euclidean_vector::at(int i) const -> double {
+		if (i < 0 or i >= this->dimensions()) {
+			throw euclidean_vector_error(
+			   fmt::format("Index {} is not valid for this euclidean_vector object", i));
+		}
+
 		return magnitude()[gsl_lite::narrow_cast<size_t>(i)];
 	}
 
 	// at function
 	auto euclidean_vector::at(int i) -> double& {
-		return magnitude()[gsl_lite::narrow_cast<size_t>(i)];
+		if (i < 0 or i >= this->dimensions()) {
+			throw euclidean_vector_error(
+			   fmt::format("Index {} is not valid for this euclidean_vector object", i));
+		}
+
+		return magnitude_[gsl_lite::narrow_cast<size_t>(i)];
 	}
 
 	// dimension getter
@@ -250,18 +252,138 @@ namespace comp6771 {
 	}
 
 	// vector addition
-	auto operator+(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {}
+	auto operator+(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {
+		auto retval = comp6771::euclidean_vector(vec1.dimensions());
+		try {
+			if (vec1.dimension_ != vec2.dimensions()) {
+				throw(euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+				                                         "match",
+				                                         vec1.dimensions(),
+				                                         vec2.dimensions())));
+			}
+			for (auto i = 0; i < vec1.dimensions(); i++) {
+				retval[i] = vec1[i] + vec2[i];
+			}
+		} catch (euclidean_vector_error& e) {
+			std::cout << e.what();
+		}
+
+		return retval;
+	}
 
 	// vector subtraction
-	auto operator-(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {}
+	auto operator-(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {
+		auto retval = comp6771::euclidean_vector(vec1.dimensions());
+		try {
+			if (vec1.dimension_ != vec2.dimensions()) {
+				throw(euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+				                                         "match",
+				                                         vec1.dimensions(),
+				                                         vec2.dimensions())));
+			}
+			for (auto i = 0; i < vec1.dimensions(); i++) {
+				retval[i] = vec1[i] - vec2[i];
+			}
+		} catch (euclidean_vector_error& e) {
+			std::cout << e.what();
+		}
+
+		return retval;
+	}
 
 	// Multiplication by a scalar
-	auto operator*(euclidean_vector const& vec, double n) -> euclidean_vector {}
+	auto operator*(euclidean_vector const& vec, double n) -> euclidean_vector {
+		auto retval = comp6771::euclidean_vector(vec.dimensions());
+		for (auto i = 0; i < vec.dimensions(); i++) {
+			retval[i] = vec[i] * n;
+		}
+
+		return retval;
+	}
 
 	// Division by a scalar
-	auto operator/(euclidean_vector const& vec, double n) -> euclidean_vector {}
+	auto operator/(euclidean_vector const& vec, double n) -> euclidean_vector {
+		auto retval = comp6771::euclidean_vector(vec.dimensions());
+		try {
+			if (n == 0) {
+				throw(euclidean_vector_error("Invalid vector division by 0"));
+			}
+			for (auto i = 0; i < vec.dimensions(); i++) {
+				retval[i] = vec[i] / n;
+			}
+		} catch (euclidean_vector_error& e) {
+			std::cout << e.what();
+		}
+
+		return retval;
+	}
+
+	// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+	auto euclidean_vector::magnitude() const -> std::unique_ptr<double[]> {
+		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+		auto mag = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dimensions()));
+		for (auto i = 0; i < dimensions(); i++) {
+			mag[gsl_lite::narrow_cast<size_t>(i)] = magnitude_[gsl_lite::narrow_cast<size_t>(i)];
+		}
+
+		return mag;
+	}
+
+	// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+	auto euclidean_vector::set_magnitude(std::unique_ptr<double[]> mag, int dim) -> void {
+		// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+		magnitude_ = std::make_unique<double[]>(gsl_lite::narrow_cast<size_t>(dim));
+
+		for (auto i = 0; i < dimensions(); i++) {
+			magnitude_[gsl_lite::narrow_cast<size_t>(i)] = mag[gsl_lite::narrow_cast<size_t>(i)];
+		}
+	}
+
+	auto euclidean_vector::set_dimension(int dim) -> void {
+		dimension_ = dim;
+	}
 
 	// Outputting to an iostream
-	auto operator<<(std::ostream& strm, euclidean_vector const& vec) -> std::ostream& {}
+	auto operator<<(std::ostream& os, euclidean_vector const& vec) -> std::ostream& {
+		os << "[";
+		for (auto i = 0; i < vec.dimensions(); i++) {
+			if (i != 0) { // Insert spaces in the correct places
+				os << " ";
+			}
+			os << vec[i];
+		}
+		os << "]";
+		return os;
+	}
+
+	// Calculate the euclidean norm of a euclidean vector
+	auto euclidean_norm(euclidean_vector const& v) -> double {
+		auto retval = double(0);
+		for (auto i = 0; i < v.dimensions(); i++) {
+			retval += sqrt(v[i] * v[i]);
+		}
+		return retval;
+	}
+
+	// Returns the unit vector of v
+	auto unit(euclidean_vector const& v) -> euclidean_vector {
+		auto retval = comp6771::euclidean_vector(v.dimensions());
+		auto euc_norm = euclidean_norm(v);
+		for (auto i = 0; i < v.dimensions(); i++) {
+			retval[i] = v[i] / euc_norm;
+		}
+
+		return retval;
+	}
+
+	// Computes the dot product of 2 vectors x and y
+	auto dot(euclidean_vector const& x, euclidean_vector const& y) -> double {
+		auto retval = double(0);
+		for (auto i = 0; i < x.dimensions(); i++) {
+			retval += x[i] * y[i];
+		}
+
+		return retval;
+	}
 
 } // namespace comp6771

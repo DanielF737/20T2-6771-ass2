@@ -30,8 +30,8 @@ namespace comp6771 {
 		euclidean_vector(std::vector<double>::const_iterator start,
 		                 std::vector<double>::const_iterator end);
 		euclidean_vector(std::initializer_list<double> vals);
-		euclidean_vector(euclidean_vector const& old);
-		euclidean_vector(euclidean_vector&& old) noexcept;
+		euclidean_vector(euclidean_vector const& src);
+		euclidean_vector(euclidean_vector&& src) noexcept;
 
 		// Destructor
 		~euclidean_vector() = default;
@@ -64,9 +64,7 @@ namespace comp6771 {
 		   -> euclidean_vector;
 		friend auto operator*(euclidean_vector const& vec, double n) -> euclidean_vector;
 		friend auto operator/(euclidean_vector const& vec, double n) -> euclidean_vector;
-		friend auto operator<<(std::ostream& strm, euclidean_vector const& vec) -> std::ostream&;
-
-		// Utility Functions
+		friend auto operator<<(std::ostream& os, euclidean_vector const& vec) -> std::ostream&;
 
 	private:
 		// Attributes
@@ -82,5 +80,10 @@ namespace comp6771 {
 		auto set_magnitude(std::unique_ptr<double[]> mag, int dim) -> void;
 		auto set_dimension(int dim) -> void;
 	};
+
+	// Utility Functions
+	auto euclidean_norm(euclidean_vector const& v) -> double;
+	auto unit(euclidean_vector const& v) -> euclidean_vector;
+	auto dot(euclidean_vector const& x, euclidean_vector const& y) -> double;
 } // namespace comp6771
 #endif // COMP6771_EUCLIDEAN_VECTOR_HPP
