@@ -617,26 +617,338 @@ TEST_CASE("Member Functions") {
 	}
 }
 
-TEST_CASE("Friend Functions") {
-	SECTION("Equal") {}
+TEST_CASE("2 Vectors Friend Functions") {
+	SECTION("Equal") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
 
-	SECTION("Not Equal") {}
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
 
-	SECTION("Addition") {}
+		// Check reflexivity
+		CHECK(v1 == v1);
+		CHECK(v2 == v2);
+		CHECK(v3 == v3);
 
-	SECTION("Subtraction") {}
+		// Check symmetry
+		auto v3_2 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+		CHECK(v3 == v3_2);
+		CHECK(v3_2 == v3);
 
-	SECTION("Multiply") {}
+		// Check transitivity
+		auto v3_3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+		CHECK(v3 == v3_2);
+		CHECK(v3_2 == v3_3);
+		CHECK(v3 == v3_3);
 
-	SECTION("Divide") {}
+		// Check false case (same dimension different values)
+		auto not_v3 = comp6771::euclidean_vector(5, 0);
+		REQUIRE(not_v3.dimensions() == 5);
+		CHECK_FALSE(v3 == not_v3);
 
-	SECTION("Output Stream") {}
+		// Check vectors of mismatched dimensions
+		CHECK_FALSE(v3 == v2);
+	}
+
+	SECTION("Not Equal") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		// Check non-reflexivity
+		CHECK_FALSE(v1 != v1);
+		CHECK_FALSE(v2 != v2);
+		CHECK_FALSE(v3 != v3);
+
+		// Check symmetry
+		auto v3_2 = comp6771::euclidean_vector{0, 0, 0, 0, 0};
+		CHECK(v3 != v3_2);
+		CHECK(v3_2 != v3);
+
+		// Check non - transitivity
+		auto v3_3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+		CHECK(v3 != v3_2);
+		CHECK(v3_2 != v3_3);
+		CHECK_FALSE(v3 != v3_3);
+
+		// Check vectors of mismatched dimensions
+		CHECK(v3 != v2);
+	}
+
+	SECTION("Addition") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK((v1 + v1) == v1);
+
+		auto expected = comp6771::euclidean_vector{11.1};
+		CHECK((v2 + comp6771::euclidean_vector{10}) == expected);
+
+		expected = comp6771::euclidean_vector{11.1, 12.2, 13.3, 14.4, 15.5};
+		CHECK((v3 + comp6771::euclidean_vector(5, 10)) == expected);
+
+		expected = comp6771::euclidean_vector{-8.9, -7.8, -6.7, -5.6, -4.5};
+		CHECK((v3 + comp6771::euclidean_vector(5, -10)) == expected);
+
+		CHECK_THROWS_WITH(v2 + v3, "Dimensions of LHS(1) and RHS(5) do not match");
+	}
+
+	SECTION("Subtraction") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK((v1 - v1) == v1);
+
+		auto expected = comp6771::euclidean_vector{-8.9};
+		CHECK((v2 - comp6771::euclidean_vector{10}) == expected);
+
+		expected = comp6771::euclidean_vector{-8.9, -7.8, -6.7, -5.6, -4.5};
+		CHECK((v3 - comp6771::euclidean_vector(5, 10)) == expected);
+
+		expected = comp6771::euclidean_vector{11.1, 12.2, 13.3, 14.4, 15.5};
+		CHECK((v3 - comp6771::euclidean_vector(5, -10)) == expected);
+
+		CHECK_THROWS_WITH(v2 + v3, "Dimensions of LHS(1) and RHS(5) do not match");
+	}
+}
+
+TEST_CASE("Other Friend Functions") {
+	SECTION("Multiply") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK(v1 * 1 == v1);
+
+		CHECK(v2 * 2 == comp6771::euclidean_vector{2.2});
+
+		CHECK(v3 * -1 == comp6771::euclidean_vector{-1.1, -2.2, -3.3, -4.4, -5.5});
+		CHECK(v3 * 0 == comp6771::euclidean_vector(5, 0));
+	}
+
+	SECTION("Divide") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK(v1 / 1 == v1);
+
+		CHECK(v2 / 2 == comp6771::euclidean_vector{0.55});
+
+		CHECK(v3 / -1 == comp6771::euclidean_vector{-1.1, -2.2, -3.3, -4.4, -5.5});
+		CHECK(v3 / 2 == comp6771::euclidean_vector{0.55, 1.1, 1.65, 2.2, 2.75});
+
+		CHECK_THROWS_WITH(v3 / 0, "Invalid vector division by 0");
+	}
+
+	SECTION("Output Stream") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{-1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == -1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK(fmt::format("{}", v1) == "[]");
+		CHECK(fmt::format("{}", v2) == "[-1.1]");
+		CHECK(fmt::format("{}", v3) == "[1.1 2.2 3.3 4.4 5.5]");
+	}
 }
 
 TEST_CASE("Utility functions") {
-	SECTION("Euclidean norm") {}
+	SECTION("Euclidean norm") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+		auto v4 = comp6771::euclidean_vector{0};
 
-	SECTION("Unit vector") {}
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
 
-	SECTION("Dot product") {}
+		CHECK_THROWS_WITH(comp6771::euclidean_norm(v1),
+		                  "euclidean_vector with no dimensions does not have a norm");
+
+		auto res2 = comp6771::euclidean_norm(v2);
+		CHECK(res2 == 1.1);
+
+		auto res3 = comp6771::euclidean_norm(v3);
+		CHECK(res3 == sqrt(1.1 * 1.1 + 2.2 * 2.2 + 3.3 * 3.3 + 4.4 * 4.4 + 5.5 * 5.5));
+
+		auto res4 = comp6771::euclidean_norm(v4);
+		CHECK(res4 == 0);
+	}
+
+	SECTION("Unit vector") {
+		// Empty vector
+		auto v1 = comp6771::euclidean_vector(0);
+		// Single dim vector
+		auto v2 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v3 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		auto v4 = comp6771::euclidean_vector{0};
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 0);
+		REQUIRE(v2.dimensions() == 1);
+		REQUIRE(v3.dimensions() == 5);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v3[0] == 1.1);
+		REQUIRE(v3[1] == 2.2);
+		REQUIRE(v3[2] == 3.3);
+		REQUIRE(v3[3] == 4.4);
+		REQUIRE(v3[4] == 5.5);
+
+		CHECK_THROWS_WITH(comp6771::unit(v1),
+		                  "euclidean_vector with no dimensions does not have a unit vector");
+
+		auto res2 = comp6771::unit(v2);
+		CHECK(res2 == comp6771::euclidean_vector{1});
+
+		auto ev_norm = comp6771::euclidean_norm(v3);
+		auto res3 = comp6771::unit(v3);
+		CHECK(res3
+		      == comp6771::euclidean_vector{1.1 / ev_norm,
+		                                    2.2 / ev_norm,
+		                                    3.3 / ev_norm,
+		                                    4.4 / ev_norm,
+		                                    5.5 / ev_norm});
+
+		CHECK_THROWS_WITH(comp6771::unit(v4),
+		                  "euclidean_vector with zero euclidean normal does not have a unit vector");
+	}
+
+	SECTION("Dot product") {
+		// Single dim vector
+		auto v1 = comp6771::euclidean_vector{1.1};
+		// Multi dim vector
+		auto v2 = comp6771::euclidean_vector{1.1, 2.2, 3.3, 4.4, 5.5};
+
+		auto v3 = comp6771::euclidean_vector{2};
+		auto v4 = comp6771::euclidean_vector(5, 2);
+
+		// Ensure vectors created correctly
+		REQUIRE(v1.dimensions() == 1);
+		REQUIRE(v2.dimensions() == 5);
+		REQUIRE(v3.dimensions() == 1);
+		REQUIRE(v4.dimensions() == 5);
+		REQUIRE(v1[0] == 1.1);
+		REQUIRE(v2[0] == 1.1);
+		REQUIRE(v2[1] == 2.2);
+		REQUIRE(v2[2] == 3.3);
+		REQUIRE(v2[3] == 4.4);
+		REQUIRE(v2[4] == 5.5);
+
+		CHECK(comp6771::dot(v1, v1) == 1.1 * 1.1);
+		CHECK(comp6771::dot(v1, v3) == 1.1 * 2);
+		CHECK(comp6771::dot(v2, v4) == (1.1 * 2) + (2.2 * 2) + (3.3 * 2) + (4.4 * 2) + (5.5 * 2));
+
+		CHECK_THROWS_WITH(comp6771::dot(v1, v2), "Dimensions of LHS(1) and RHS(5) do not match");
+	}
 }

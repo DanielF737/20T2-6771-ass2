@@ -233,6 +233,9 @@ namespace comp6771 {
 
 	// equality operator
 	auto operator==(euclidean_vector const& vec1, euclidean_vector const& vec2) -> bool {
+		if (vec1.dimensions() != vec2.dimensions()) {
+			return false;
+		}
 		for (auto i = 0; i < vec1.dimensions(); i++) {
 			if (vec1[i] != vec2[i]) {
 				return false;
@@ -243,6 +246,9 @@ namespace comp6771 {
 
 	// not equals operator
 	auto operator!=(euclidean_vector const& vec1, euclidean_vector const& vec2) -> bool {
+		if (vec1.dimensions() != vec2.dimensions()) {
+			return true;
+		}
 		for (auto i = 0; i < vec1.dimensions(); i++) {
 			if (vec1[i] != vec2[i]) {
 				return true;
@@ -254,18 +260,14 @@ namespace comp6771 {
 	// vector addition
 	auto operator+(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {
 		auto retval = comp6771::euclidean_vector(vec1.dimensions());
-		try {
-			if (vec1.dimension_ != vec2.dimensions()) {
-				throw(euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
-				                                         "match",
-				                                         vec1.dimensions(),
-				                                         vec2.dimensions())));
-			}
-			for (auto i = 0; i < vec1.dimensions(); i++) {
-				retval[i] = vec1[i] + vec2[i];
-			}
-		} catch (euclidean_vector_error& e) {
-			std::cout << e.what();
+		if (vec1.dimension_ != vec2.dimensions()) {
+			throw euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+			                                         "match",
+			                                         vec1.dimensions(),
+			                                         vec2.dimensions()));
+		}
+		for (auto i = 0; i < vec1.dimensions(); i++) {
+			retval[i] = vec1[i] + vec2[i];
 		}
 
 		return retval;
@@ -274,18 +276,14 @@ namespace comp6771 {
 	// vector subtraction
 	auto operator-(euclidean_vector const& vec1, euclidean_vector const& vec2) -> euclidean_vector {
 		auto retval = comp6771::euclidean_vector(vec1.dimensions());
-		try {
-			if (vec1.dimension_ != vec2.dimensions()) {
-				throw(euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
-				                                         "match",
-				                                         vec1.dimensions(),
-				                                         vec2.dimensions())));
-			}
-			for (auto i = 0; i < vec1.dimensions(); i++) {
-				retval[i] = vec1[i] - vec2[i];
-			}
-		} catch (euclidean_vector_error& e) {
-			std::cout << e.what();
+		if (vec1.dimension_ != vec2.dimensions()) {
+			throw euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not "
+			                                         "match",
+			                                         vec1.dimensions(),
+			                                         vec2.dimensions()));
+		}
+		for (auto i = 0; i < vec1.dimensions(); i++) {
+			retval[i] = vec1[i] - vec2[i];
 		}
 
 		return retval;
@@ -304,15 +302,11 @@ namespace comp6771 {
 	// Division by a scalar
 	auto operator/(euclidean_vector const& vec, double n) -> euclidean_vector {
 		auto retval = comp6771::euclidean_vector(vec.dimensions());
-		try {
-			if (n == 0) {
-				throw(euclidean_vector_error("Invalid vector division by 0"));
-			}
-			for (auto i = 0; i < vec.dimensions(); i++) {
-				retval[i] = vec[i] / n;
-			}
-		} catch (euclidean_vector_error& e) {
-			std::cout << e.what();
+		if (n == 0) {
+			throw euclidean_vector_error("Invalid vector division by 0");
+		}
+		for (auto i = 0; i < vec.dimensions(); i++) {
+			retval[i] = vec[i] / n;
 		}
 
 		return retval;
@@ -358,17 +352,28 @@ namespace comp6771 {
 
 	// Calculate the euclidean norm of a euclidean vector
 	auto euclidean_norm(euclidean_vector const& v) -> double {
+		if (v.dimensions() == 0) {
+			throw euclidean_vector_error("euclidean_vector with no dimensions does not have a norm");
+		}
 		auto retval = double(0);
 		for (auto i = 0; i < v.dimensions(); i++) {
-			retval += sqrt(v[i] * v[i]);
+			retval += v[i] * v[i];
 		}
-		return retval;
+		return sqrt(retval);
 	}
 
 	// Returns the unit vector of v
 	auto unit(euclidean_vector const& v) -> euclidean_vector {
+		if (v.dimensions() == 0) {
+			throw euclidean_vector_error("euclidean_vector with no dimensions does not have a unit "
+			                             "vector");
+		}
 		auto retval = comp6771::euclidean_vector(v.dimensions());
 		auto euc_norm = euclidean_norm(v);
+		if (euc_norm == 0) {
+			throw euclidean_vector_error("euclidean_vector with zero euclidean normal does not have a "
+			                             "unit vector");
+		}
 		for (auto i = 0; i < v.dimensions(); i++) {
 			retval[i] = v[i] / euc_norm;
 		}
@@ -378,6 +383,11 @@ namespace comp6771 {
 
 	// Computes the dot product of 2 vectors x and y
 	auto dot(euclidean_vector const& x, euclidean_vector const& y) -> double {
+		if (x.dimensions() != y.dimensions()) {
+			throw euclidean_vector_error(fmt::format("Dimensions of LHS({}) and RHS({}) do not match",
+			                                         x.dimensions(),
+			                                         y.dimensions()));
+		}
 		auto retval = double(0);
 		for (auto i = 0; i < x.dimensions(); i++) {
 			retval += x[i] * y[i];
